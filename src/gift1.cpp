@@ -21,29 +21,27 @@ struct person
     list<int> friends_list;
     unsigned int num_friends;
 
-    int money;
+    int initial_money;
     int money_each_gift;
-    int money_left;
+    int account_money;
 
     person()
         : num_friends(0)
-        , money(0)
+        , initial_money(0)
         , money_each_gift(0)
-        , money_left(0)
+        , account_money(0)
     {
     }
 
     void add_friend(int friend_index)
     {
-        friends_list.push_back(friend_index);
-
-        money_each_gift = money / num_friends;
-        money_left = money % num_friends;
+        friends_list.push_back(friend_index);        
+        money_each_gift = (num_friends == 0) ? 0 : (initial_money / num_friends);
     }
 
     void receive_gift(int gift_money)
     {
-        money += gift_money;
+        account_money += gift_money;
     }
 
     void give_gift()
@@ -53,13 +51,13 @@ struct person
         {
             person *rcvr = find_person_by_idx(*it);
             rcvr->receive_gift(money_each_gift);
-            money -= money_each_gift;
+            account_money -= money_each_gift;
         }
     }
 
     void print_money(ostream& os)
     {
-        os << name << " " << money << endl;
+        os << name << " " << account_money - initial_money << endl;
     }
 };
 
@@ -128,7 +126,8 @@ void get_input(istream& is)
 
         p->name = name;
         p->num_friends = num_friends;
-        p->money = initial_money;
+        p->initial_money = initial_money;
+        p->account_money = initial_money; 
 
         for (int j = 0; j < num_friends; ++j)
         {
@@ -153,9 +152,11 @@ int main(int argc, char **argv)
     for (; it != g_group.end(); ++it)
         (*it)->give_gift();
 
-    for (it = g_group.begin(); it != g_group.end(); ++it)
-    {
-        (*it)->print_money(ofs);
+    person_names_vector::iterator nit = g_names.begin();
+    for (;nit != g_names.end(); ++nit)
+    { 
+        person *p = find_person_by_idx(find_idx_by_name((*nit))); 
+        p->print_money(ofs);
     }
     
     release(); 
