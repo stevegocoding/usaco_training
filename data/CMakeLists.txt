@@ -1,2 +1,3 @@
 install(FILES ride.in DESTINATION bin/ride)
 install(FILES gift1.in DESTINATION bin/gift1)
+install(FILES friday.in DESTINATION bin/friday)
