@@ -55,6 +55,8 @@ public:
             else 
                 return false; 
         }
+
+        // return (m_year % 4 == 0) && (m_year % 100 != 0 || m_year % 400 == 0); 
     }
 
     void next_day()
