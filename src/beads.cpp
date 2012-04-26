@@ -52,7 +52,8 @@ int main(int argc, char **argv)
 
     while (g_cur_brk < g_num_beads)
     {   
-        int total = 0; 
+        int l_total = 0;
+        int r_total = 0; 
         int runner = prev(g_cur_brk); 
         char ch = prev_bead(g_cur_brk); 
         char prev_ch = ch;
@@ -64,8 +65,8 @@ int main(int argc, char **argv)
             prev_ch = ch; 
             ch = prev_bead(runner);
             runner = prev(runner);
-            total++; 
-            if (total >= g_num_beads)
+            l_total++; 
+            if (l_total >= g_num_beads)
                 break;
         }
         runner = g_cur_brk; 
@@ -78,22 +79,22 @@ int main(int argc, char **argv)
             prev_ch = ch;
             ch = next_bead(runner);
             runner = next(runner); 
-            total++;
-            if (total >= g_num_beads)
+            r_total++;
+            if (r_total >= g_num_beads)
                 break;
         }
         
-        if (total >= g_num_beads)
+        if (l_total + r_total >= g_num_beads)
         {
             g_max_total = g_num_beads; 
             break;
         }
 
-        if (total > g_max_total)
-            g_max_total = total; 
+        if (l_total + r_total > g_max_total)
+            g_max_total = l_total + r_total; 
 
         // g_cur_brk += runner;
-        g_cur_brk++; 
+        g_cur_brk += r_total; 
     } 
 
     ofs << g_max_total << endl;
