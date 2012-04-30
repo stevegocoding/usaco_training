@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     int temp2 = 0; 
     unsigned int minimum = 100000; 
     unsigned int maximum = 0; 
-    for (++it; it != intervals.end(); ++it)
+    for (; it != intervals.end(); ++it)
     {
         /*
         if ((temp2 = (it->start - temp.end)) > 0)
@@ -75,14 +75,7 @@ int main(int argc, char **argv)
         temp2 = max(d0, d1); 
         minimum = min(minimum, it->start); 
         maximum = max(maximum, it->end); 
-        
-        if (d0 < 0 || d1 < 0) 
-        {
-            temp.merge(*it);
-            if (temp.end - temp.start > longest.end - longest.start)
-                longest = temp;
-        }
-        else 
+        if (d0 > 0 || d1 > 0)
         {
             if (temp.end - temp.start > longest.end - longest.start)
                 longest = temp;
@@ -90,6 +83,12 @@ int main(int argc, char **argv)
                 longest_no_milk = temp2; 
             temp = *it;
             continue;
+        }
+        else 
+        {
+            temp.merge(*it);
+            if (temp.end - temp.start > longest.end - longest.start)
+                longest = temp;
         }
     }
 
