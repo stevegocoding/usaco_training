@@ -4,146 +4,94 @@ LANG: C++
 PROG: transform
 */
 
+#include <iostream>
 #include <fstream>
 #include <vector>
 
-using namespace std;
+using namespace std; 
 
-bool varify_rotate_90(const vector<char>& before, const vector<char>& after, unsigned int dim)
+typedef vector<vector<char> > board_t; 
+
+void init_board(board_t& board, int n)
 {
-    for (unsigned int i = 0; i < dim*dim; ++i)
-    {
-        int row = i / dim - (int)(dim / 2); 
-        int col = i % dim - (int)(dim / 2); 
-
-        int t_row = col + (int)(dim / 2);
-        int t_col = -row + (int)(dim / 2); 
-        
-        if (before[i] != after[t_row * dim + t_col]) 
-            return false; 
-    }
-    return true; 
+	board.resize(n); 
+	for (int i = 0; i < n; ++i)
+		board[i].resize(n); 
 }
 
-bool varify_rotate_180(const vector<char>& before, const vector<char>& after, unsigned int dim)
+board_t rotate_90(const board_t& a)
 {
-    for (unsigned int i = 0; i < dim*dim; ++i)
-    {
-        int row = i / dim - (int)(dim / 2); 
-        int col = i % dim - (int)(dim / 2); 
+	int n = (int)a.size();
 
-        int t_row = -row + (int)(dim / 2);
-        int t_col = -col + (int)(dim / 2);
-        
-        if (before[i] != after[t_row * dim + t_col]) 
-            return false; 
-    }
-    return true; 
+	board_t b; 
+	init_board(b, n); 
+	for (int i = 0; i < n; ++i) 
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			b[j][n-1-i] = a[i][j]; 
+		}
+	}
+	return b; 
 }
 
-bool varify_rotate_270(const vector<char>& before, const vector<char>& after, unsigned int dim)
+board_t reflect_h(const board_t& a)
 {
-    for (unsigned int i = 0; i < dim*dim; ++i)
-    {
-        int row = i / dim - (int)(dim / 2); 
-        int col = i % dim - (int)(dim / 2); 
+	int n = (int)a.size(); 
 
-        int t_row = -col + (int)(dim / 2);
-        int t_col = row + (int)(dim / 2);
-        
-        if (before[i] != after[t_row * dim + t_col]) 
-            return false; 
-    }
-    return true; 
+	board_t b; 
+	init_board(b, n);
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			b[i][n-1-j] = a[i][j];  
+		}
+	}
+	return b; 
 }
 
-bool varify_reflect(const vector<char>& before, const vector<char>& after, unsigned int dim)
+bool is_equal(const board_t& a, const board_t& b)
 {
-    for (unsigned int i = 0; i < dim*dim; ++i)
-    {
-        int row = i / dim - (int)(dim / 2); 
-        int col = i % dim - (int)(dim / 2); 
-
-        int t_row = -row + (int)(dim / 2);
-        int t_col = col + (int)(dim / 2);
-        
-        if (before[i] != after[t_row * dim + t_col]) 
-            return false; 
-    }
-    return true; 
+	int n = (int)a.size(); 
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			if (a[i][j] != b[i][j])
+				return false; 
+		}
+	}
+	return true; 
 }
 
-bool varify_combination(const vector<char>& before, const vector<char>& after, unsigned int dim)
+void read_board(ifstream& ifs, int n, board_t& board)
 {
-    int which_rotate = -1;
-    for (unsigned int i = 0; i < dim*dim; ++i)
-    {
-        int row = i / dim - (int)(dim / 2); 
-        int col = i % dim - (int)(dim / 2); 
-
-        int t_row = -row;
-        int t_col = col;
-
-        int tt_row_90 = t_col + (int)(dim / 2); 
-        int tt_col_90 = -t_row + (int)(dim / 2);
-
-        int tt_row_180 = -t_row + (int)(dim / 2); 
-        int tt_col_180 = -t_col + (int)(dim / 2); 
-
-        int tt_row_270 = -t_col + (int)(dim / 2); 
-        int tt_col_270 = t_row + (int)(dim / 2); 
-        
-        if (before[i] == after[tt_row_90 * dim + tt_col_90]) 
-        {
-            if (which_rotate == -1)
-            {
-                which_rotate = 0;
-                continue;
-            }
-            else if (which_rotate != 0) 
-                return false;
-            else 
-                continue; 
-        }
-        else if (before[i] == after[tt_row_180 * dim + tt_col_180])
-        {
-            if (which_rotate == -1)
-            {
-                which_rotate = 1;
-                continue;
-            }
-            else if (which_rotate != 1) 
-                return false;
-            else 
-                continue; 
-        }
-        else if (before[i] == after[tt_row_270 * dim + tt_col_270])
-        {
-            if (which_rotate == -1)
-            {
-                which_rotate = 2;
-                continue;
-            }
-            else if (which_rotate != 2) 
-                return false;
-            else 
-                continue; 
-        }
-        else 
-            return false;
-    }
-    return true; 
+	init_board(board, n);
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			char ch; 
+			ifs >> ch; 
+			board[i][j] = ch;  
+		}
+	}
 }
 
-bool varify_no_changes(const vector<char>& before, const vector<char>& after, unsigned int dim)
+void print_board(const board_t& board)
 {
-    for (unsigned int i = 0; i < dim*dim; ++i)
-    {   
-        if (before[i] != after[i]) 
-            return false; 
-    }
-    return true; 
-}
+	int n = (int)board.size();
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			cout << board[i][j] << " "; 
+		}
+		cout << endl; 
+	}
+	cout << endl;
+} 
 
 int main(int argc, char **argv)
 {
@@ -152,42 +100,32 @@ int main(int argc, char **argv)
 
     unsigned int dim; 
     ifs >> dim; 
+	
+	board_t origin, temp, final; 
+	read_board(ifs, dim, origin);
+	read_board(ifs, dim, final);  
+	int change = 0; 
 
-    vector<char> before;
-    vector<char> after;
-    before.reserve(dim*dim); 
-    after.reserve(dim*dim); 
+	if (is_equal(rotate_90(origin), final)) 
+		change = 1; 
+	else if (is_equal(rotate_90(rotate_90(origin)), final))
+		change = 2; 
+	else if (is_equal(rotate_90(rotate_90(rotate_90(origin))), final))
+		change = 3; 
+	else if (is_equal(reflect_h(origin), final))
+		change = 4; 
+	else if (is_equal(reflect_h(origin), final) || 
+				is_equal(rotate_90(reflect_h(origin)), final) || 
+				is_equal(rotate_90(rotate_90(reflect_h(origin))), final) || 
+				is_equal(rotate_90(rotate_90(rotate_90(reflect_h(origin)))), final))
+		change = 5; 
+	else if (is_equal(origin, final))
+		change = 6; 
+	else 
+		change = 7; 
 
-    for (unsigned int i = 0; i < dim * dim; ++i)
-    {
-        char ch;
-        ifs >> ch;
-        before.push_back(ch);
-    }
-    for (unsigned int j = 0; j < dim * dim; ++j)
-    {
-        char ch;
-        ifs >> ch;
-        after.push_back(ch);
-    }
-
-    unsigned int result = 0;
-    if (varify_rotate_90(before, after, dim))
-        result = 1;
-    else if (varify_rotate_180(before, after, dim))
-        result = 2; 
-    else if (varify_rotate_270(before, after, dim))
-        result = 3; 
-    else if (varify_reflect(before, after, dim))
-        result = 4; 
-    else if (varify_combination(before, after, dim))
-        result = 5; 
-    else if (varify_no_changes(before, after, dim))
-        result = 6;
-    else 
-        result = 7; 
-
-    ofs << result << endl; 
-   
-    return 0; 
+	ofs << change << endl;
+	ofs.close(); 
+    
+	return 0; 
 }

@@ -1,6 +1,8 @@
-install(FILES ride.in DESTINATION bin/ride)
-install(FILES gift1.in DESTINATION bin/gift1)
-install(FILES friday.in DESTINATION bin/friday)
-install(FILES beads.in DESTINATION bin/beads)
-install(FILES milk2.in DESTINATION bin/milk2)
-install(FILES transform.in DESTINATION bin/transform)
+set(DATA_FILES 
+	transform.in
+	namenum.in
+	dict.txt
+	palsquare.in
+	dualpal.in
+	)
+install(FILES ${DATA_FILES} DESTINATION bin/)

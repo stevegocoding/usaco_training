@@ -1,12 +1,11 @@
-add_executable(ride ride.cpp)
-add_executable(gift1 gift1.cpp ../data/gift1.in)
-add_executable(friday friday.cpp ../data/friday.in)
-add_executable(beads beads.cpp ../data/beads.in)
-add_executable(milk2 milk2.cpp ../data/milk2.in)
+set(PROBS
+	transform
+	namenum
+	palsquare
+	dualpal
+	)
 add_executable(transform transform.cpp ../data/transform.in)
-install(TARGETS ride RUNTIME DESTINATION bin/ride)
-install(TARGETS gift1 RUNTIME DESTINATION bin/gift1)
-install(TARGETS friday RUNTIME DESTINATION bin/friday)
-install(TARGETS beads RUNTIME DESTINATION bin/beads)
-install(TARGETS milk2 RUNTIME DESTINATION bin/milk2)
-install(TARGETS transform RUNTIME DESTINATION bin/transform)
+add_executable(namenum namenum.cpp ../data/namenum.in ../data/dict.txt)
+add_executable(palsquare palsquare.cpp ../data/palsquare.in)
+add_executable(dualpal dualpal.cpp ../data/dualpal.in)
+install(TARGETS ${PROBS} RUNTIME DESTINATION bin/)
