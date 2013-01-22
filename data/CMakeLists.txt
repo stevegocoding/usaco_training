@@ -4,5 +4,6 @@ set(DATA_FILES
 	dict.txt
 	palsquare.in
 	dualpal.in
+	milk.in
 	)
 install(FILES ${DATA_FILES} DESTINATION bin/)
