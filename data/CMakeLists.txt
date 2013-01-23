@@ -6,5 +6,7 @@ set(DATA_FILES
 	dualpal.in
 	milk.in
 	barn1.in
+	calfflac.in
+	crypt1.in
 	)
 install(FILES ${DATA_FILES} DESTINATION bin/)
