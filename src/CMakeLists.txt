@@ -4,10 +4,12 @@ set(PROBS
 	palsquare
 	dualpal
 	milk
+	barn1
 	)
 add_executable(transform transform.cpp ../data/transform.in)
 add_executable(namenum namenum.cpp ../data/namenum.in ../data/dict.txt)
 add_executable(palsquare palsquare.cpp ../data/palsquare.in)
 add_executable(dualpal dualpal.cpp ../data/dualpal.in)
 add_executable(milk milk.cpp ../data/milk.in)
-install(TARGETS ${PROBS} RUNTIME DESTINATION bin/)
+add_executable(barn1 barn1.cpp ../data/barn1.in)
+install(TARGETS ${PROBS} RUNTIME DESTINATION bin/) 
