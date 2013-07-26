@@ -8,5 +8,6 @@ set(DATA_FILES
 	barn1.in
 	calfflac.in
 	crypt1.in
+	clocks.in
 	)
 install(FILES ${DATA_FILES} DESTINATION bin/)
