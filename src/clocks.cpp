@@ -44,20 +44,28 @@ public:
 		std::copy(clocks.begin(), clocks.end(), back_inserter(m_clocks)); 
 	}
 	
-	c_clocks move(int move_idx)
-	{	
-		vector<vector<int> > temp; 
-		std::copy(m_clocks.begin(), m_clocks.end(), back_inserter(temp)); 
+	void move(int move_idx)
+	{
 		for (size_t i = 0; i < move_ways[move_idx].size(); ++i)
 		{
 			int row = move_ways[move_idx][i]/3;
 			int col = move_ways[move_idx][i]%3;
-			temp[row][col] += 3;
-			if (temp[row][col] > 12)
-				temp[row][col] -= 12;
+			m_clocks[row][col] += 3;
+			if (m_clocks[row][col] > 12)
+				m_clocks[row][col] -= 12;
 		}
+	}
 
-		return c_clocks(temp);
+	void undo_move(int move_idx)
+	{
+		for (size_t i = 0; i < move_ways[move_idx].size(); ++i)
+		{
+			int row = move_ways[move_idx][i]/3;
+			int col = move_ways[move_idx][i]%3;
+			m_clocks[row][col] -= 3;
+			if (m_clocks[row][col] <= 0)
+				m_clocks[row][col] += 12;
+		}
 	}
 
 	bool is_all_12() const
@@ -101,79 +109,47 @@ c_clocks read_input_clocks(ifstream& ifs)
 	}
 
 	return c_clocks(clocks);
-}
+} 
 
-vector<int> move_count(9, 0);
-
-void truncated_dfs(c_clocks& clocks, int depth, vector<int>& move_steps, vector<vector<int> >& results)
+vector<int> best_moves(9, 0);
+int n_best_moves = 0; 
+void dfs(c_clocks& clocks, int move_idx, vector<int>& move_reps)
 {
-	if (clocks.is_all_12())
+	if (move_idx == 9)
 	{
-		results.push_back(move_steps);
-		return;
-	}
-
-	if (depth == 0)
-		return; 
-	
-	for (int i = 0; i < (int)move_ways.size(); ++i)
-	{
-		if (move_count[i] >= 3)
-			return; 
-		
-		if (!results.empty() && (move_steps.size() >= results[0].size() || (i+1) >= results[0][move_steps.size()]))
-			return; 
-		
-		c_clocks moved_clocks = clocks.move(i); 
-		move_count[i]++;
-		move_steps.push_back(i+1); 
-		truncated_dfs(moved_clocks, depth-1, move_steps, results);
-		move_steps.pop_back();
-		move_count[i]--; 
-	} 
-}
-
-void dfs_iterative_deepening(c_clocks& clocks, vector<vector<int> >& results)
-{
-	int max_depth = 11;
-	//for (int depth = 0; depth < max_depth; ++depth)
-	{
-		vector<int> steps; 
-		truncated_dfs(clocks, 11, steps, results);
-		steps.clear();
-		move_count = vector<int>(9, 0);
-	}
-}
-
-void bfs(c_clocks& clocks, vector<vector<int> >& results)
-{
-	deque<c_clocks> q;
-	vector<int> path;
-	
-	q.push_back(clocks);
-
-	while (!q.empty())
-	{
-		c_clocks currrent = q.front();
-		q.pop_front(); 
-
-		if (currrent.is_all_12())
+		if (clocks.is_all_12())
 		{
-			results.push_back(path);
-			path.clear();
-			q.clear(); 
-			q.push_back(clocks);
-			return;
+			int n = 0; 
+			for (int i = 0; i < 9; ++i)
+			{
+				n += move_reps[i];
+			}
+			if (n_best_moves == 0 || n < n_best_moves)
+			{
+				n_best_moves = n;
+				for (int i = 0; i < 9; ++i)
+					//std::copy(move_reps.begin(), move_reps.end(), best_moves); 
+					best_moves[i] = move_reps[i];
+			}	
+		}
+		return; 
+	}
+
+	for (int rep = 3; rep >= 0; --rep)
+	{
+		for (int i = 0; i < rep; ++i)
+		{
+			clocks.move(move_idx); 
 		}
 		
-		for (int i = 0; i < (int)move_ways.size(); ++i)
+		move_reps[move_idx] = rep;
+		
+		dfs(clocks, move_idx+1, move_reps);
+
+		// Undo move 
+		for (int i = 0; i < rep; ++i)
 		{
-			if (!results.empty() && ((path.size() + 1) >= results[0].size() || (i+1) >= results[0][path.size()]))
-				continue;
-			
-			c_clocks moved_clocks = clocks.move(i); 
-			q.push_back(moved_clocks);
-			path.push_back(i+1);
+			clocks.undo_move(move_idx); 
 		}
 	}
 }
@@ -185,24 +161,23 @@ int main(int argc, char **argv)
 
 	init_moves_table();
 	
-	c_clocks clocks = read_input_clocks(ifs); 
-	vector<vector<int> > results;
-	
-	//bfs(clocks, results); 
-	dfs_iterative_deepening(clocks, results);
-	
-	if (results.size() > 0)
+	c_clocks clocks = read_input_clocks(ifs);
+
+	vector<int> move_reps(9, 0);
+	dfs(clocks, 0, move_reps);
+
+	string sep = "";
+	for (int i = 0; i < 9; ++i)
 	{
-		for (size_t i = 0; i < results[0].size(); ++i)
+		for (int j = 0; j < best_moves[i]; ++j)
 		{
-			ofs << results[0][i];
-			if (i == results[0].size()-1)
-				ofs << std::endl; 
-			else 
-				ofs << " "; 
+			ofs << sep.c_str() << i + 1;
+			sep = " ";
 		}
 	}
-	
+
+	ofs << std::endl;
+
 	ifs.close();
 	ofs.close();
 
