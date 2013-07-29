@@ -9,5 +9,9 @@ set(DATA_FILES
 	calfflac.in
 	crypt1.in
 	clocks.in
+	ariprog.in
+	milk3.in
+	numtri.in
+	pprime.in
 	)
 install(FILES ${DATA_FILES} DESTINATION bin/)
